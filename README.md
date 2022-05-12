@@ -14,3 +14,5 @@
 ## Dataset
 
 数据包括 [训练集](./dataset/train.csv) 和 [测试集](./dataset/test.csv) 两部分，由于是课程作业，因此测试集部分的标签真值结果并未公布。
+
+数据集的原始描述文件：[Description of the Dataset](./dataset/README.md)。
