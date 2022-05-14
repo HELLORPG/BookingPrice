@@ -1,6 +1,7 @@
 # 对数据文件进行读取和写入等操作
 
 import pandas as pd
+from data import BookingInfo
 
 
 class DataFile:
@@ -66,10 +67,22 @@ class DataFile:
 
         return info_list
 
+    def csv_to_booking_info(self):
+        """
+        将CSV文件中的每一条记录读取成为BookingInfo格式。
+        :return: a line of data is in class BookingInfo.
+        """
+        info_list = self.csv_to_info_dict()
+        for i in range(0, len(info_list)):
+            info_list[i] = BookingInfo(info_list[i])
+
+        return info_list
+
 
 if __name__ == '__main__':
     train_file = DataFile("../dataset/train.csv")
-    train_data = train_file.csv_to_info_dict()
-    print(train_data)
+    train_data = train_file.csv_to_booking_info()
+    # print(train_data)
     print(type(train_data))
     print(len(train_data))
+    print(type(train_data[0]))

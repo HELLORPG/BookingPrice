@@ -32,7 +32,7 @@ class BookingInfo:
         :param info: booking info in dict.
         """
         self.description = info["description"]
-        self.neighbor = info["info"]
+        self.neighbor = info["neighbor"]
         self.latitude = info["latitude"]
         self.longitude = info["longitude"]
         self.type = info["type"]
@@ -52,6 +52,33 @@ class BookingInfo:
             self.__has_price = True
             self.price = info["price"]
 
+    def __str__(self):
+        return self.to_dict().__str__()
+
+    def to_dict(self):
+        info = dict()
+        info["description"] = self.description
+        info["neighbor"] = self.neighbor
+        info["latitude"] = self.latitude
+        info["longitude"] = self.longitude
+        info["type"] = self.type
+        info["accommodates"] = self.accommodates
+        info["bathrooms"] = self.bathrooms
+        info["bedrooms"] = self.bedrooms
+        info["amenities"] = self.amenities
+        info["reviews"] = self.reviews
+        info["review_rating"] = self.review_rating
+        info["review_A"] = self.review_A
+        info["review_B"] = self.review_B
+        info["review_C"] = self.review_C
+        info["review_D"] = self.review_D
+        info["instant_bookable"] = self.instant_bookable
+
+        if self.__has_price:
+            info["price"] = self.price
+
+        return info
+
     def _price(self):
         if self.__has_price:
             return self.price
@@ -61,5 +88,4 @@ class BookingInfo:
 
     def _has_price(self):
         return self.__has_price
-
 

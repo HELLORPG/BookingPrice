@@ -3,3 +3,5 @@
 dataset/*.csv
 !dataset/test.csv
 !dataset/train.csv
+
+*.pyc
