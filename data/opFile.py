@@ -1,6 +1,8 @@
 # 对数据文件进行读取和写入等操作
 
 import pandas as pd
+
+import data
 from data import BookingInfo
 
 
@@ -67,7 +69,7 @@ class DataFile:
 
         return info_list
 
-    def csv_to_booking_info(self):
+    def csv_to_booking_info(self) -> list[BookingInfo]:
         """
         将CSV文件中的每一条记录读取成为BookingInfo格式。
         :return: a line of data is in class BookingInfo.
