@@ -79,13 +79,13 @@ class BookingInfo:
 
         return info
 
-    def _price(self):
+    def get_price(self):
         if self.__has_price:
             return self.price
         else:
             print("This info has no self.price.")
             exit(-1)
 
-    def _has_price(self):
+    def has_price(self):
         return self.__has_price
 
