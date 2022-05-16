@@ -7,8 +7,8 @@ class BookingInfo:
         """
         self.description = None
         self.neighbor = None
-        self.latitude = None
-        self.longitude = None
+        self.latitude = None    # 纬度
+        self.longitude = None   # 经度
         self.type = None
         self.accommodates = None
         self.bathrooms = None
@@ -88,4 +88,11 @@ class BookingInfo:
 
     def has_price(self):
         return self.__has_price
+
+    def get_location(self):
+        """
+        返回经纬度位置信息
+        :return: [longitude, latitude]
+        """
+        return self.longitude, self.latitude
 

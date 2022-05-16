@@ -5,3 +5,4 @@ dataset/*.csv
 !dataset/train.csv
 
 *.pyc
+outputs/
