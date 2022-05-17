@@ -17,6 +17,7 @@ class DFDataset(Dataset):
         if use_subset:
             indices_len = len(path_or_subset.indices)
             self.data = pd.concat([path_or_subset.dataset[path_or_subset.indices[i]] for i in range(0, indices_len)])
+            # self.data = path_or_subset[:len(path_or_subset.indices)]
             # indices = path_or_subset.indices
             # self.data = path_or_subset.dataset[indices[0]]
             # for i in range(1, len(indices)):
