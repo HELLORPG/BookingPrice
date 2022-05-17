@@ -2,11 +2,11 @@
 # 只是用于测试一些函数等尝试性探索
 
 from data.utils import strs_to_tokens
-from data import DataFile, BookingInfo
+from data import InfoFile, BookingInfo
 
 
 if __name__ == '__main__':
-    infos = DataFile("./dataset/train.csv").csv_to_booking_info()
+    infos = InfoFile("./dataset/train.csv").csv_to_booking_info()
 
     info_t2s, info_s2t = dict(), dict()
     for info in infos:

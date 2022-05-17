@@ -3,7 +3,7 @@
 import os
 
 from data import BookingInfo
-from data import DataFile
+from data import InfoFile
 import matplotlib.pyplot as plt
 # import numpy as np
 # from mpl_toolkits.mplot3d import Axes3D
@@ -19,7 +19,7 @@ def location_scatter_from_booking_info_file(input_path: str, save_path=None, cma
     :return: None.
     """
 
-    data_file = DataFile(input_path)
+    data_file = InfoFile(input_path)
 
     booking_infos = data_file.csv_to_booking_info()
 

@@ -7,7 +7,7 @@ from data import BookingInfo
 from ast import literal_eval
 
 
-class DataFile:
+class InfoFile:
     def __init__(self):
         """
         创建一个空的数据文件类
@@ -90,7 +90,7 @@ class DataFile:
 
 
 if __name__ == '__main__':
-    train_file = DataFile("../dataset/train.csv")
+    train_file = InfoFile("../dataset/train.csv")
     train_data = train_file.csv_to_booking_info()
     # print(train_data)
     print(type(train_data))
