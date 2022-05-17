@@ -2,7 +2,6 @@
 
 import pandas as pd
 
-import data
 from data import BookingInfo
 from ast import literal_eval
 
@@ -35,9 +34,9 @@ class InfoFile:
         将csv文件中的每一条记录读取成为list形式
         :return: a line of data is a list.
         """
-        datas = self.csv_to_dataframe()
-        datas = datas.values.tolist()
-        return datas
+        data = self.csv_to_dataframe()
+        data = data.values.tolist()
+        return data
 
     def csv_to_info_dict(self):
         """

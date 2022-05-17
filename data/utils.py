@@ -1,3 +1,4 @@
+from torch.utils.data import Dataset, DataLoader
 
 
 def strs_to_tokens(strs: list[str], token2str=None, str2token=None) -> (list[int], dict, dict):
