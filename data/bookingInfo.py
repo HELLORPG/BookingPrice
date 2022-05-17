@@ -13,7 +13,7 @@ class BookingInfo:
         self.accommodates = None
         self.bathrooms = None
         self.bedrooms = None
-        self.amenities = None
+        self.amenities = None   # 设施
         self.reviews = None
         self.review_rating = None
         self.review_A = None
