@@ -4,6 +4,7 @@ import pandas as pd
 
 import data
 from data import BookingInfo
+from ast import literal_eval
 
 
 class DataFile:
@@ -27,9 +28,10 @@ class DataFile:
         """
         assert len(self.path) >= 4
         assert self.path[-4:] == ".csv"
-        data = pd.read_csv(self.path, sep=",", header=0)    # data in DataFrame
-        data = data.values.tolist()
-        return data
+        datas = pd.read_csv(self.path, sep=",", header=0)    # data in DataFrame
+        datas = datas.values.tolist()
+
+        return datas
 
     def csv_to_info_dict(self):
         """
@@ -53,7 +55,7 @@ class DataFile:
             info["accommodates"] = line[5]
             info["bathrooms"] = line[6]
             info["bedrooms"] = line[7]
-            info["amenities"] = line[8]
+            info["amenities"] = literal_eval(line[8])   # 在pandas中会被解析成为str数据格式，因此需要转换成list
             info["reviews"] = line[9]
             info["review_rating"] = line[10]
             info["review_A"] = line[11]
