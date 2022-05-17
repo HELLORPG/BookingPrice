@@ -21,16 +21,22 @@ class DataFile:
         """
         self.path = path
 
+    def csv_to_dataframe(self):
+        """
+        最原始的pandas读取方式，读取成为DataFrame形式。
+        :return: datas in DataFrame.
+        """
+        assert len(self.path) >= 4
+        assert self.path[-4:] == ".csv"
+        return pd.read_csv(self.path, sep=",", header=0)    # data in DataFrame
+
     def csv_to_list(self):
         """
         将csv文件中的每一条记录读取成为list形式
         :return: a line of data is a list.
         """
-        assert len(self.path) >= 4
-        assert self.path[-4:] == ".csv"
-        datas = pd.read_csv(self.path, sep=",", header=0)    # data in DataFrame
+        datas = self.csv_to_dataframe()
         datas = datas.values.tolist()
-
         return datas
 
     def csv_to_info_dict(self):

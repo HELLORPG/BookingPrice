@@ -10,11 +10,7 @@ if __name__ == '__main__':
 
     info_t2s, info_s2t = dict(), dict()
     for info in infos:
-        print(type(info.amenities))
         info.amenities, info_t2s, info_s2t = strs_to_tokens(info.amenities, token2str=info_t2s, str2token=info_s2t)
-        print(info)
-        print(info_s2t)
-        exit(-1)
 
-    print(infos[0])
+    print(infos[5])
     print(info_s2t)
