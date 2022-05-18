@@ -48,6 +48,8 @@ class BookingInfo:
             if "price" in info:
                 self.__has_price = True
                 self.price = info["price"]
+            else:
+                self.__has_price = False
 
     def __str__(self):
         return self.to_dict().__str__()
