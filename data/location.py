@@ -50,16 +50,51 @@ def location_scatter_from_booking_infos(infos: list[BookingInfo], save_path=None
         longitude, latitude = info.get_location()
         latitudes.append(latitude)
         longitudes.append(longitude)
-        prices.append(info.get_price())
+        if info.has_price():
+            prices.append(info.get_price())
 
-    location_scatter_from_xyps(
-        xs=longitudes,
-        ys=latitudes,
-        ps=prices,
-        save_path=save_path,
-        title=title,
-        cmap=cmap
-    )
+    if len(prices) > 0:
+        location_scatter_from_xyps(
+            xs=longitudes,
+            ys=latitudes,
+            ps=prices,
+            save_path=save_path,
+            title=title,
+            cmap=cmap
+        )
+    else:
+        location_scatter_from_xys(
+            xs=longitudes,
+            ys=latitudes,
+            save_path=save_path,
+            title=title,
+        )
+
+    return
+
+
+def location_scatter_from_xys(xs: list, ys: list, save_path=None, title="Location"):
+    """
+    输入位置信息列表，从而生成散点图并且保存在指定位置。
+    :param xs: xs.
+    :param ys: ys.
+    :param save_path: fig save path.
+    :param title: scatter title.
+    :return: None
+    """
+    plt.figure(dpi=600)
+
+    plt.scatter(xs, ys, s=0.1, c="b")
+    plt.title(title)
+
+    if save_path is None:
+        plt.show()
+    else:
+        save_dir, save_filename = os.path.split(save_path)
+        os.makedirs(save_dir, exist_ok=True)
+        plt.savefig(save_path)
+
+    plt.close()
 
     return
 

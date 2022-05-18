@@ -16,7 +16,8 @@ class DFDataset(Dataset):
         """
         if use_subset:
             indices_len = len(path_or_subset.indices)
-            self.data = pd.concat([path_or_subset.dataset[path_or_subset.indices[i]] for i in range(0, indices_len)])
+            self.data = pd.concat([path_or_subset.dataset[path_or_subset.indices[i]] for i in range(0, indices_len)], ignore_index=True)
+            # self.data = self.data.drop(self.data.columns[[0]], axis=1)
             # self.data = path_or_subset[:len(path_or_subset.indices)]
             # indices = path_or_subset.indices
             # self.data = path_or_subset.dataset[indices[0]]
@@ -39,7 +40,7 @@ class DFDataset(Dataset):
         """
         filedir, _ = os.path.split(path)
         os.makedirs(filedir, exist_ok=True)
-        self.data.to_csv(path, sep=",", header=True)
+        self.data.to_csv(path, sep=",", header=True, index=None)
         return
 
 

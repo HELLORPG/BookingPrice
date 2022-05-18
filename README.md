@@ -34,3 +34,35 @@
 - instant_bookable：房源是否可以立即预定，使用 t 或者 f 表示。`Example: f`
 
 数据集的原始描述文件：[Description of the Dataset](./dataset/README.md)。
+
+
+
+## Run
+
+本项目中可运行的所有模块都集成在了`run.py`中，可以使用`python run.py [--args-name args-value]`的形式运行。
+
+整理了目前支持的运行模块以及各个参数的设置方法：
+
+### 划分数据集
+```bash
+python run.py --part split-train-val --input-path <original train set path> --train-path <train set path> --val-path <val set path> [--train-ratio <train set ratio> / --train-size <train set size> / --val-size <val set size>] 
+```
+末尾`[]`中的三个参数选择一个填入即可，如果重复写入则会按照上述给出的顺序优先采用靠前的参数。
+
+Example:
+```bash
+python run.py --part split-train-val --input-path ./dataset/train.csv --train-path ./dataset/split/train.csv --val-path ./dataset/split/val.csv --val-size 5000
+```
+
+### 可视化房屋经纬度（位置）和价格的关系
+```bash
+python run.py --part location-visualization --input-path <data set path> --output-path [figure save path]
+```
+只需要指定运行模块和输入输出路径即可，如果不提供输出路径，则仅仅只会展示在屏幕上，而不保存；提供了输出路径，则不会展示，而仅保存。
+
+Example:
+```bash
+python run.py --part location-visualization --input-path ./dataset/split/train.csv --output-path ./outputs/location_visualization/train.png
+```
+
+

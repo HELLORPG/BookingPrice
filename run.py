@@ -1,6 +1,7 @@
 import argparse
 
 from data.location import location_scatter_from_booking_info_file
+from data.dataset import split_train_val
 
 
 def run_args_parser() -> argparse.ArgumentParser:
@@ -19,6 +20,13 @@ def run_args_parser() -> argparse.ArgumentParser:
     # 输出路径
     args_parser.add_argument("--output-path", type=str)
 
+    # 对于split_train_val独有的参数
+    args_parser.add_argument("--train-path", type=str)
+    args_parser.add_argument("--val-path", type=str)
+    args_parser.add_argument("--train-ratio", type=float)
+    args_parser.add_argument("--train-size", type=int)
+    args_parser.add_argument("--val-size", type=int)
+
     return args_parser
 
 
@@ -28,10 +36,38 @@ def main(args):
     :param args: 传入的运行参数
     :return:
     """
-    if args.part == "location_visualization":
+    if args.part == "location-visualization":
         input_path = args.input_path
         save_path = args.output_path
         location_scatter_from_booking_info_file(input_path=input_path, save_path=save_path)
+    elif args.part == "split-train-val":
+        whole_train_path = args.input_path
+        train_path = args.train_path
+        val_path = args.val_path
+        if args.train_ratio is not None:
+            split_train_val(
+                input_path=whole_train_path,
+                train_path=train_path,
+                val_path=val_path,
+                train_ratio=args.train_ratio
+            )
+        elif args.train_size is not None:
+            split_train_val(
+                input_path=whole_train_path,
+                train_path=train_path,
+                val_path=val_path,
+                train_size=args.train_size
+            )
+        elif args.val_size is not None:
+            split_train_val(
+                input_path=whole_train_path,
+                train_path=train_path,
+                val_path=val_path,
+                val_size=args.val_size
+            )
+        else:
+            print("Do Not Know how to split dataset.")
+            exit(-1)
     else:
         print("run.py do not support part: %s." % args.part)
         exit(-1)
