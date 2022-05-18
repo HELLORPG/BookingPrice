@@ -1,5 +1,9 @@
 # 用来表示房屋预定信息
 
+from enum import Enum
+from math import floor
+
+
 class BookingInfo:
     def __init__(self, info=None):
         """
@@ -94,4 +98,66 @@ class BookingInfo:
         :return: [longitude, latitude]
         """
         return self.longitude, self.latitude
+
+
+class BathroomType(Enum):
+    UNKNOWN = 0
+    SHARED = 1
+    PRIVATE = 2
+
+
+class Bathroom:
+    """
+    用来描述卫生间信息的类别
+    """
+    def __init__(self, bathrooms: str):
+        """
+        初始化一个关于卫生间信息的描述类。
+        :param bathrooms: bathrooms information in string, always from class bookingInfo
+        """
+        if bathrooms[-1] == "s":    # 去除单复数的影响
+            bathrooms = bathrooms[:-1]
+
+        assert bathrooms[-5:] == " bath"
+        bathrooms = bathrooms[:-5]  # 截断最后的" bath"五个字符
+
+        if len(bathrooms) > 6 and bathrooms[-6:] == "shared":
+            self.type = BathroomType.SHARED
+            bathrooms = bathrooms[:-7]
+        elif len(bathrooms) > 7 and bathrooms[-7:] == "private":
+            self.type = BathroomType.PRIVATE
+            bathrooms = bathrooms[:-8]
+        else:
+            self.type = BathroomType.UNKNOWN
+
+        self.num = float(bathrooms)
+
+    def to_str(self):
+        """
+        转化成为str类型。
+        :return: bathrooms info in type string.
+        """
+        num_floor = floor(self.num)
+        res = str(num_floor)
+        if self.num - num_floor > 0.01:     # 判断是否是0.5结尾
+            res += ".5"
+        res += " "
+
+        if self.type is BathroomType.SHARED:
+            res += "shared bath"
+        elif self.type is BathroomType.PRIVATE:
+            res += "private bath"
+        else:
+            res += "bath"
+
+        if num_floor > 1 or (num_floor == 1 and self.num - num_floor > 0.01):
+            res += "s"
+
+        return res
+
+
+if __name__ == '__main__':
+    bathroom = Bathroom("0.5 private bath")
+    print(bathroom.type, bathroom.num)
+    print(bathroom.to_str())
 
