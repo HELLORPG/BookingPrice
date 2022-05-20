@@ -1,7 +1,10 @@
 # 用来表示房屋预定信息
 
+import math
+
 from enum import Enum
 from math import floor
+from data.utils import strs_to_tokens
 
 
 class BookingInfo:
@@ -38,7 +41,8 @@ class BookingInfo:
             self.longitude = info["longitude"]
             self.type = info["type"]
             self.accommodates = info["accommodates"]
-            self.bathrooms = info["bathrooms"]
+            # self.bathrooms = info["bathrooms"]
+            self.bathrooms = Bathroom(bathrooms=info["bathrooms"])
             self.bedrooms = info["bedrooms"]
             self.amenities = info["amenities"]
             self.reviews = info["reviews"]
@@ -66,7 +70,7 @@ class BookingInfo:
         info["longitude"] = self.longitude
         info["type"] = self.type
         info["accommodates"] = self.accommodates
-        info["bathrooms"] = self.bathrooms
+        info["bathrooms"] = self.bathrooms.to_str()
         info["bedrooms"] = self.bedrooms
         info["amenities"] = self.amenities
         info["reviews"] = self.reviews
@@ -101,9 +105,10 @@ class BookingInfo:
 
 
 class BathroomType(Enum):
-    UNKNOWN = 0
-    SHARED = 1
-    PRIVATE = 2
+    UNKNOWN = 1
+    SHARED = 2
+    PRIVATE = 3
+    MISSING = 0
 
 
 class Bathroom:
@@ -115,10 +120,21 @@ class Bathroom:
         初始化一个关于卫生间信息的描述类。
         :param bathrooms: bathrooms information in string, always from class bookingInfo
         """
+        if isinstance(bathrooms, float) or isinstance(bathrooms, int):
+            if math.isnan(bathrooms):
+                self.type = BathroomType.MISSING
+                self.num = 0
+                return
+            else:
+                self.type = BathroomType.UNKNOWN
+                self.num = float(bathrooms)
+                return
+
         if bathrooms[-1] == "s":    # 去除单复数的影响
             bathrooms = bathrooms[:-1]
 
-        assert bathrooms[-5:] == " bath"
+        # print(bathrooms)
+        assert bathrooms[-4:] == "bath"
         bathrooms = bathrooms[:-5]  # 截断最后的" bath"五个字符
 
         if len(bathrooms) > 6 and bathrooms[-6:] == "shared":
@@ -127,10 +143,32 @@ class Bathroom:
         elif len(bathrooms) > 7 and bathrooms[-7:] == "private":
             self.type = BathroomType.PRIVATE
             bathrooms = bathrooms[:-8]
+        elif bathrooms == "Shared half":
+            self.type = BathroomType.SHARED
+            self.num = 0.5
+            return
+        elif bathrooms == "Private half":
+            self.type = BathroomType.PRIVATE
+            self.num = 0.5
+            return
         else:
             self.type = BathroomType.UNKNOWN
 
-        self.num = float(bathrooms)
+        # if (type(eval(bathrooms)) == float) or (type(eval(bathrooms)) == int):
+        #     self.num = float(bathrooms)
+        # elif bathrooms == "Half":
+        #     self.num = 0.5
+        # else:
+        #     print("Not support bathroom num: %s" % bathrooms)
+        #     exit(-1)
+        if bathrooms.isalpha():
+            if bathrooms == "Half":
+                self.num = 0.5
+            else:
+                print("Not support bathroom num: %s" % bathrooms)
+                exit(-1)
+        else:
+            self.num = float(bathrooms)
 
     def to_str(self):
         """
@@ -156,8 +194,40 @@ class Bathroom:
         return res
 
 
+def get_neighbor_tokenizer(infos: list[BookingInfo]) -> (dict, dict):
+    """
+    输入BookingInfo的列表，返回一个序列化的标准。
+    :param infos: BookingInfo s
+    :return: (token2str, str2token)
+    """
+    strs = list()
+    for info in infos:
+        strs.append(info.neighbor)
+
+    return get_strs_tokenizer(strs=strs)
+
+
+def get_strs_tokenizer(strs: list[str]) -> (dict, dict):
+    """
+    输入string的列表，表示属性。
+    :param strs: string list.
+    :return: (token2str, str2token)
+    """
+    token2str = dict()
+    str2token = dict()
+
+    for s in strs:
+        _, token2str, str2token = strs_to_tokens([s], token2str=token2str, str2token=str2token)
+
+    return token2str, str2token
+
+
 if __name__ == '__main__':
-    bathroom = Bathroom("0.5 private bath")
-    print(bathroom.type, bathroom.num)
-    print(bathroom.to_str())
+    # bathroom = Bathroom("0.5 private bath")
+    # print(bathroom.type, bathroom.num)
+    # print(bathroom.to_str())
+    from data import InfoFile
+    all_infos = InfoFile("../dataset/train.csv").csv_to_booking_info()
+    neighbor_token2str, neighbor_str2token = get_neighbor_tokenizer(all_infos)
+    print(neighbor_str2token)
 
