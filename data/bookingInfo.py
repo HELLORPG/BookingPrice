@@ -4,7 +4,7 @@ import math
 
 from enum import Enum
 from math import floor
-from data.bookingToken import get_neighbor_tokenizer
+# from data.bookingToken import get_neighbor_tokenizer
 
 
 class BookingInfo:
@@ -105,10 +105,10 @@ class BookingInfo:
 
 
 class BathroomType(Enum):
-    UNKNOWN = 1
-    SHARED = 2
-    PRIVATE = 3
-    MISSING = 0
+    UNKNOWN = 0
+    SHARED = 1
+    PRIVATE = 2
+    MISSING = 3
 
 
 class Bathroom:
@@ -199,9 +199,11 @@ if __name__ == '__main__':
     # print(bathroom.type, bathroom.num)
     # print(bathroom.to_str())
     from data import InfoFile
+    from data.bookingToken import get_neighbor_tokenizer
     all_infos = InfoFile("../dataset/split/val.csv").csv_to_booking_info()
     neighbor_token2str, neighbor_str2token = get_neighbor_tokenizer(all_infos)
     test_infos = InfoFile("../dataset/test.csv").csv_to_booking_info()
     print(get_neighbor_tokenizer(test_infos))
     print(neighbor_str2token)
+    # print(BathroomType.MISSING.value)
 
