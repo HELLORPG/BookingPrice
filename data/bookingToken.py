@@ -187,3 +187,8 @@ if __name__ == '__main__':
     all_infos = InfoFile("../dataset/split/train.csv").csv_to_booking_info()
     all_tokens, _ = infos_to_tokens(all_infos)
     print(all_tokens[0].amenities)
+
+    token = all_tokens[0]
+    for name, value in vars(token).items():
+        print(name, value)
+        print(type(value))
