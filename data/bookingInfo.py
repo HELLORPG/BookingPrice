@@ -4,7 +4,7 @@ import math
 
 from enum import Enum
 from math import floor
-from data.utils import strs_to_tokens
+from data.bookingToken import get_neighbor_tokenizer
 
 
 class BookingInfo:
@@ -33,7 +33,7 @@ class BookingInfo:
 
             # 用来表示标签，只有训练数据会有
             self.__has_price = False
-            self.price = None
+            self.__price = None
         else:
             self.description = info["description"]
             self.neighbor = info["neighbor"]
@@ -55,7 +55,7 @@ class BookingInfo:
 
             if "price" in info:
                 self.__has_price = True
-                self.price = info["price"]
+                self.__price = info["price"]
             else:
                 self.__has_price = False
 
@@ -82,13 +82,13 @@ class BookingInfo:
         info["instant_bookable"] = self.instant_bookable
 
         if self.__has_price:
-            info["price"] = self.price
+            info["price"] = self.__price
 
         return info
 
     def get_price(self):
         if self.__has_price:
-            return self.price
+            return self.__price
         else:
             print("This info has no self.price.")
             exit(-1)
@@ -194,40 +194,14 @@ class Bathroom:
         return res
 
 
-def get_neighbor_tokenizer(infos: list[BookingInfo]) -> (dict, dict):
-    """
-    输入BookingInfo的列表，返回一个序列化的标准。
-    :param infos: BookingInfo s
-    :return: (token2str, str2token)
-    """
-    strs = list()
-    for info in infos:
-        strs.append(info.neighbor)
-
-    return get_strs_tokenizer(strs=strs)
-
-
-def get_strs_tokenizer(strs: list[str]) -> (dict, dict):
-    """
-    输入string的列表，表示属性。
-    :param strs: string list.
-    :return: (token2str, str2token)
-    """
-    token2str = dict()
-    str2token = dict()
-
-    for s in strs:
-        _, token2str, str2token = strs_to_tokens([s], token2str=token2str, str2token=str2token)
-
-    return token2str, str2token
-
-
 if __name__ == '__main__':
     # bathroom = Bathroom("0.5 private bath")
     # print(bathroom.type, bathroom.num)
     # print(bathroom.to_str())
     from data import InfoFile
-    all_infos = InfoFile("../dataset/train.csv").csv_to_booking_info()
+    all_infos = InfoFile("../dataset/split/val.csv").csv_to_booking_info()
     neighbor_token2str, neighbor_str2token = get_neighbor_tokenizer(all_infos)
+    test_infos = InfoFile("../dataset/test.csv").csv_to_booking_info()
+    print(get_neighbor_tokenizer(test_infos))
     print(neighbor_str2token)
 
