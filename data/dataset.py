@@ -15,8 +15,10 @@ class DFDataset(Dataset):
         :param path_or_subset: Data file path or a Subset instance.
         """
         if use_subset:
-            indices_len = len(path_or_subset.indices)
-            self.data = pd.concat([path_or_subset.dataset[path_or_subset.indices[i]] for i in range(0, indices_len)], ignore_index=True)
+            # indices_len = len(path_or_subset.indices)
+            sub_len = len(path_or_subset)
+            # self.data = pd.concat([path_or_subset.dataset[path_or_subset.indices[i]] for i in range(0, indices_len)], ignore_index=True)
+            self.data = pd.concat([path_or_subset[i] for i in range(0, sub_len)], ignore_index=True)
             # self.data = self.data.drop(self.data.columns[[0]], axis=1)
             # self.data = path_or_subset[:len(path_or_subset.indices)]
             # indices = path_or_subset.indices
