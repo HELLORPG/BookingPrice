@@ -1,3 +1,5 @@
+import numpy as np
+
 from torch.utils.data import Dataset, DataLoader
 
 
@@ -23,6 +25,32 @@ def strs_to_tokens(strs: list[str], token2str=None, str2token=None) -> (list[int
         tokens.append(str2token[s])
 
     return tokens, token2str, str2token
+
+
+def get_statistic(values, mode: str):
+    if isinstance(values, list):
+        values = np.array(values, dtype=np.float32)
+    if mode == "mean":
+        return np.nanmean(values)
+    elif mode == "std":
+        return np.nanstd(values)
+    elif mode == "min":
+        return np.nanmin(values)
+    elif mode == "max":
+        return np.nanmax(values)
+    elif mode == "median":
+        return np.nanmean
+    else:
+        print("Mode %s is not supported." % mode)
+        exit(-1)
+
+
+def z_score(value, mean: float, std: float):
+    return (value - mean) / std
+
+
+def min_max(value, value_min: float, value_max: float):
+    return (value - value_min) / (value_max - value_min)
 
 
 if __name__ == '__main__':
