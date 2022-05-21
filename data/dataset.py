@@ -5,7 +5,7 @@ import torch
 import pandas as pd
 
 from torch.utils.data import Dataset
-from data import InfoFile
+from data import InfoFile, BookingToken
 
 
 class DFDataset(Dataset):
@@ -80,6 +80,17 @@ def split_train_val(input_path: str, train_path: str, val_path: str, train_ratio
     val_dataset.to_csv(val_path)
 
     return
+
+
+class BookingDataset(Dataset):
+    def __init__(self, booking_tokens: list[BookingToken]):
+        self.data = booking_tokens
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, item):
+        return
 
 
 if __name__ == '__main__':

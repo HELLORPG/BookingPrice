@@ -4,7 +4,7 @@
 from math import isnan
 
 from data import BookingInfo
-from data.utils import strs_to_tokens
+from data.utils import strs_to_tokens, get_statistic
 from data.bookingInfo import Bathroom, BathroomType
 
 
@@ -49,6 +49,8 @@ class BookingToken:
             self.__has_price = False
             self.__price = None
 
+        self.aline_feature = None
+
         return
 
     def has_price(self):
@@ -57,6 +59,14 @@ class BookingToken:
     def get_price(self):
         assert self.has_price()
         return self.__price
+
+    def get_aline_feature(self) -> list:
+        return self.neighbor + [self.latitude] + [self.longitude] + self.type + [float(self.accommodates)] +\
+            self.bathrooms + [self.bedrooms] + self.amenities + [float(self.reviews)] + [self.review_rating] +\
+            [self.review_A] + [self.review_B] + [self.review_C] + [self.review_D] + [float(self.instant_bookable)]
+
+    def build_aline_feature(self) -> list:
+        self.aline_feature = self.build_aline_feature()
 
 
 def nan_handle(value):
@@ -80,7 +90,7 @@ def bathroom_to_token(bathrooms: Bathroom) -> list:
     if bathrooms.type == BathroomType.MISSING:
         return None
     else:
-        token = [0] * BathroomType.MISSING.value    # MISSING.vale表示了bathroom种类的个数
+        token = [0.0] * BathroomType.MISSING.value    # MISSING.vale表示了bathroom种类的个数
         token[bathrooms.type.value] = bathrooms.num
         return token
 
@@ -159,7 +169,7 @@ def infos_to_tokens(infos: list[BookingInfo]) -> (list[BookingToken], dict):
 def infos_to_tokens_with_tokenizer(infos: list[BookingInfo], tokenizer: dict) -> (list[BookingToken], dict):
     """
     将BookingInfo的列表转换成为BookingToken的列表，传入一个tokenizer来表示序列化的规则。
-    :param infos: booking info list.
+    :param infos: booking info list
     :param tokenizer: some attribute tokenizer.
     :return: booking token list, and the tokenizer dict.
     """
@@ -169,15 +179,15 @@ def infos_to_tokens_with_tokenizer(infos: list[BookingInfo], tokenizer: dict) ->
 
     # 进行One Hot类的映射
     for i in range(0, len(tokens)):
-        tokens[i].neighbor = [0] * len(tokenizer["neighbor"]["str2token"])
-        tokens[i].neighbor[tokenizer["neighbor"]["str2token"][infos[i].neighbor]] = 1
+        tokens[i].neighbor = [0.0] * len(tokenizer["neighbor"]["str2token"])
+        tokens[i].neighbor[tokenizer["neighbor"]["str2token"][infos[i].neighbor]] = 1.0
 
-        tokens[i].type = [0] * len(tokenizer["type"]["str2token"])
-        tokens[i].type[tokenizer["type"]["str2token"][infos[i].type]] = 1
+        tokens[i].type = [0.0] * len(tokenizer["type"]["str2token"])
+        tokens[i].type[tokenizer["type"]["str2token"][infos[i].type]] = 1.0
 
-        tokens[i].amenities = [0] * len(tokenizer["amenities"]["str2token"])
+        tokens[i].amenities = [0.0] * len(tokenizer["amenities"]["str2token"])
         for amenity in infos[i].amenities:
-            tokens[i].amenities[tokenizer["amenities"]["str2token"][amenity]] = 1
+            tokens[i].amenities[tokenizer["amenities"]["str2token"][amenity]] = 1.0
 
     return tokens, tokenizer
 
@@ -186,9 +196,9 @@ if __name__ == '__main__':
     from data import InfoFile
     all_infos = InfoFile("../dataset/split/train.csv").csv_to_booking_info()
     all_tokens, _ = infos_to_tokens(all_infos)
-    print(all_tokens[0].amenities)
+    print(all_tokens[0].get_aline_feature())
 
-    token = all_tokens[0]
-    for name, value in vars(token).items():
-        print(name, value)
-        print(type(value))
+    # token = all_tokens[0]
+    # for name, value in vars(token).items():
+    #     print(name, value)
+    #     print(type(value))
