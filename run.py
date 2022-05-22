@@ -40,7 +40,7 @@ def run_args_parser() -> argparse.ArgumentParser:
     # args_parser.add_argument("--with-test", type=str, default="True", help="Test at final.")
 
     # 超参数
-    args_parser.add_argument("--batch-size", type=int, default=10)
+    args_parser.add_argument("--batch-size", type=int, default=4)
     args_parser.add_argument("--epoch", type=int, default=100)
 
     # 优化器
@@ -49,11 +49,15 @@ def run_args_parser() -> argparse.ArgumentParser:
     args_parser.add_argument("--weight-decay", type=float, default=1e-5)
 
     # 损失函数
-    args_parser.add_argument("--loss-function", type=str, default="SmoothL1")
+    args_parser.add_argument("--loss-function", type=str, default="CEL")
 
     # 模型结构
     args_parser.add_argument("--activation", type=str, default="relu")
     args_parser.add_argument("--position-mlp-layers", default=[80, 20], type=int, nargs="+")
+    args_parser.add_argument("--room-mlp-layers", default=[20, 20], type=int, nargs="+")
+    args_parser.add_argument("--addition-mlp-layers", default=[20, 20], type=int, nargs="+")
+    args_parser.add_argument("--review-mlp-layers", default=[20, 20], type=int, nargs="+")
+    args_parser.add_argument("--final-mlp-layers", default=[200, 100, 6], type=int, nargs="+")
 
     return args_parser
 

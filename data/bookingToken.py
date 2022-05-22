@@ -74,7 +74,8 @@ class BookingToken:
         )
         features["instant"] = np.array([self.instant_bookable], dtype=np.float32)
         if self.__has_price:
-            features["price"] = np.array([self.__price], dtype=np.float32)
+            features["price"] = self.__price
+            # features["price"] = np.array([self.__price], dtype=np.float32)
         return features
 
     def build_features(self):
