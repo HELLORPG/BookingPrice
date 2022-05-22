@@ -45,7 +45,7 @@ def run_args_parser() -> argparse.ArgumentParser:
 
     # 优化器
     args_parser.add_argument("--optimizer", type=str, default="Adam")
-    args_parser.add_argument("--lr", type=float, default=1e-4)
+    args_parser.add_argument("--lr", type=float, default=5e-4)
     args_parser.add_argument("--weight-decay", type=float, default=1e-5)
 
     # 损失函数

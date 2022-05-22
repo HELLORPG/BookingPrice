@@ -124,11 +124,12 @@ def train(args):
 
 
 @torch.no_grad()
-def evaluate(args, net, dataloader, loss_function):
+def evaluate(args, net, dataloader, loss_function, is_val=True):
     net.eval()
     total_loss = 0.0
     total_len = 0
-    correct_list = list()
+    pred_list = list()
+    label_list = list()
 
     for data in dataloader:
         # 将数据放到指定位置
@@ -136,26 +137,31 @@ def evaluate(args, net, dataloader, loss_function):
             data[k] = data[k].to(args.device)
 
         output = net(data)
-        # print(data["price"].shape)
-        loss = loss_function(output, data["price"])
-
-        # 计算train的acc list
-        preds_labels = preds_to_labels(output, mode="classify")
-        correct_list += get_correct_list(preds_labels, data["price"])
 
         # 记录数据
         batch_len = output.shape[0]
-        total_loss += loss.item() * batch_len
         total_len += batch_len
 
-    average_loss = total_loss / total_len
-    average_acc = np.sum(np.array(correct_list)) / total_len
-    print("val", average_loss, average_acc)
+        # 预测和真值
+        pred_list += preds_to_labels(output, mode="classify")
+        if is_val:
+            loss = loss_function(output, data["price"])
+            total_loss += loss.item() * batch_len
+            label_list += [label.item() for label in data["price"]]
 
-    return {
-        "loss": average_loss,
-        "acc": average_acc
-    }
+    if is_val:
+        average_loss = total_loss / total_len
+        average_acc = np.sum(np.array(get_correct_list(pred_list, label_list))) / total_len
+        print("val", average_loss, average_acc)
+        return {
+            "loss": average_loss,
+            "acc": average_acc,
+            "pred_labels": pred_list
+        }
+    else:
+        return {
+            "pred_labels": pred_list
+        }
 
 
 def train_one_epoch(epoch: int, args, net, optimizer, dataloader, loss_function):
@@ -173,7 +179,8 @@ def train_one_epoch(epoch: int, args, net, optimizer, dataloader, loss_function)
 
     total_loss = 0.0
     total_len = 0
-    correct_list = list()
+    pred_list = list()
+    label_list = list()
 
     for data in dataloader:
         # 将数据放到指定位置
@@ -187,9 +194,9 @@ def train_one_epoch(epoch: int, args, net, optimizer, dataloader, loss_function)
         loss.backward()
         optimizer.step()
 
-        # 计算train的acc list
-        pred_lables = preds_to_labels(output, mode="classify")
-        correct_list += get_correct_list(pred_lables, data["price"])
+        # 保存pred和真值
+        pred_list += preds_to_labels(output, mode="classify")
+        label_list += [label.item() for label in data["price"]]
 
         # 记录数据
         batch_len = output.shape[0]
@@ -197,12 +204,13 @@ def train_one_epoch(epoch: int, args, net, optimizer, dataloader, loss_function)
         total_len += batch_len
 
     average_loss = total_loss / total_len
-    average_acc = np.sum(np.array(correct_list)) / total_len
+    average_acc = np.sum(np.array(get_correct_list(pred_list, label_list))) / total_len
     print("train", average_loss, average_acc)
 
     return {
         "loss": average_loss,
-        "acc": average_acc
+        "acc": average_acc,
+        "pred_labels": pred_list,
     }
 
 
@@ -215,15 +223,12 @@ def preds_to_labels(preds: torch.Tensor, mode="classify"):
     return pred_labels
 
 
-def get_correct_list(preds: torch.Tensor, targets: torch.Tensor):
-    res = list()
-    preds = preds.cpu()
-    targets = targets.cpu()
-    for i in range(0, len(preds)):
-        if preds[i] == targets[i]:
-            res.append(1)
+def get_correct_list(pred_list: list, label_list: list):
+    correct = list()
+    for i in range(0, len(pred_list)):
+        if pred_list[i] == label_list[i]:
+            correct.append(1)
         else:
-            res.append(0)
-
-    return res
+            correct.append(0)
+    return correct
 
