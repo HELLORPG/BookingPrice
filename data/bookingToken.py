@@ -410,4 +410,7 @@ if __name__ == '__main__':
     all_tokens = norm_tokens(all_tokens, statistics)
     for token in all_tokens:
         token.build_aline_feature()
-        print(token.amenities)
+        print(token.aline_feature)
+        for a in token.aline_feature:
+            assert a <= 1 + 0.0001
+            assert a >= 0 - 0.0001

@@ -21,11 +21,13 @@ def run_args_parser() -> argparse.ArgumentParser:
     args_parser.add_argument("--output-path", type=str)
 
     # 对于split_train_val独有的参数
-    args_parser.add_argument("--train-path", type=str)
-    args_parser.add_argument("--val-path", type=str)
+    args_parser.add_argument("--train-path", type=str)      # 和train过程中的train path共用
+    args_parser.add_argument("--val-path", type=str)        # 和train过程中的val path共用
     args_parser.add_argument("--train-ratio", type=float)
     args_parser.add_argument("--train-size", type=int)
     args_parser.add_argument("--val-size", type=int)
+
+    # 对于训练使用的参数
 
     return args_parser
 
