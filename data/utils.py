@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 
 from torch.utils.data import Dataset, DataLoader
@@ -29,6 +31,9 @@ def strs_to_tokens(strs: list[str], token2str=None, str2token=None) -> (list[int
 
 def get_statistic(values, mode: str):
     if isinstance(values, list):
+        for i in range(0, len(values)):
+            if values[i] is None:
+                values[i] = math.nan
         values = np.array(values, dtype=np.float32)
     if mode == "mean":
         return np.nanmean(values)
