@@ -90,7 +90,7 @@ class BookingDataset(Dataset):
         return len(self.data)
 
     def __getitem__(self, item):
-        return
+        return self.data[item].features
 
 
 if __name__ == '__main__':
