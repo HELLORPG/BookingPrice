@@ -2,6 +2,7 @@
 # 便于后续的处理
 
 import numpy as np
+import torch
 
 from math import isnan
 from data import ImportantAmenity
@@ -51,7 +52,7 @@ class BookingToken:
             self.__has_price = False
             self.__price = None
 
-        self.aline_feature = None
+        self.features = None
 
         return
 
@@ -65,92 +66,109 @@ class BookingToken:
     def get_features(self) -> dict:
         features = dict()
         features["position"] = np.array(self.neighbor + [self.latitude] + [self.longitude], dtype=np.float32)
+        features["room"] = np.array(self.type + [self.accommodates] + self.bathrooms + [self.bedrooms], dtype=np.float32)
+        features["addition"] = np.array(self.amenities, dtype=np.float32)
+        features["review"] = np.array(
+            [self.reviews, self.review_rating, self.review_A, self.review_B, self.review_C, self.review_D],
+            dtype=np.float32
+        )
+        features["instant"] = np.array([self.instant_bookable], dtype=np.float32)
+        if self.__has_price:
+            features["price"] = np.array([self.__price], dtype=np.float32)
         return features
+
+    def build_features(self):
+        self.features = self.get_features()
 
     # def build_aline_feature(self):
     #     self.aline_feature = self.get_aline_feature()
 
 
-def norm_tokens(tokens: list[BookingToken], token_statistics: dict):
+def norm_tokens(tokens: list[BookingToken], token_statistics: dict, mode="min-max"):
     """
     对所有的tokens进行norm。
     :param tokens:
     :param token_statistics:
+    :param mode: norm mode
     :return:
     """
-    for i in range(0, len(tokens)):
-        tokens[i].latitude = min_max(
-            value=tokens[i].latitude,
-            value_max=token_statistics["latitude"]["max"],
-            value_min=token_statistics["latitude"]["min"]
-        )
-
-        tokens[i].longitude = min_max(
-            value=tokens[i].longitude,
-            value_max=token_statistics["longitude"]["max"],
-            value_min=token_statistics["longitude"]["min"]
-        )
-
-        tokens[i].longitude = min_max(
-            value=tokens[i].accommodates,
-            value_max=token_statistics["accommodates"]["max"],
-            value_min=token_statistics["accommodates"]["min"]
-        )
-
-        tokens[i].bedrooms = min_max(
-            value=tokens[i].bedrooms,
-            value_max=token_statistics["bedrooms"]["max"],
-            value_min=token_statistics["bedrooms"]["min"]
-        )
-
-        tokens[i].accommodates = min_max(
-            value=tokens[i].accommodates,
-            value_max=token_statistics["accommodates"]["max"],
-            value_min=token_statistics["accommodates"]["min"]
-        )
-
-        tokens[i].reviews = min_max(
-            value=tokens[i].reviews,
-            value_max=token_statistics["reviews"]["max"],
-            value_min=token_statistics["reviews"]["min"]
-        )
-
-        tokens[i].review_rating = min_max(
-            value=tokens[i].review_rating,
-            value_max=token_statistics["review_rating"]["max"],
-            value_min=token_statistics["review_rating"]["min"]
-        )
-
-        tokens[i].review_A = min_max(
-            value=tokens[i].review_A,
-            value_max=token_statistics["review_ABCD"]["max"],
-            value_min=token_statistics["review_ABCD"]["min"]
-        )
-
-        tokens[i].review_B = min_max(
-            value=tokens[i].review_B,
-            value_max=token_statistics["review_ABCD"]["max"],
-            value_min=token_statistics["review_ABCD"]["min"]
-        )
-
-        tokens[i].review_C = min_max(
-            value=tokens[i].review_C,
-            value_max=token_statistics["review_ABCD"]["max"],
-            value_min=token_statistics["review_ABCD"]["min"]
-        )
-
-        tokens[i].review_D = min_max(
-            value=tokens[i].review_D,
-            value_max=token_statistics["review_ABCD"]["max"],
-            value_min=token_statistics["review_ABCD"]["min"]
-        )
-
-        for j in range(0, len(tokens[i].bathrooms)):
-            tokens[i].bathrooms[j] = min_max(
-                value=tokens[i].bathrooms[j],
-                value_max=token_statistics["bathrooms"]["max"],
-                value_min=token_statistics["bathrooms"]["min"]
+    if mode == "min-max":
+        for i in range(0, len(tokens)):
+            tokens[i].latitude = min_max(
+                value=tokens[i].latitude,
+                value_max=token_statistics["latitude"]["max"],
+                value_min=token_statistics["latitude"]["min"]
             )
+
+            tokens[i].longitude = min_max(
+                value=tokens[i].longitude,
+                value_max=token_statistics["longitude"]["max"],
+                value_min=token_statistics["longitude"]["min"]
+            )
+
+            tokens[i].longitude = min_max(
+                value=tokens[i].accommodates,
+                value_max=token_statistics["accommodates"]["max"],
+                value_min=token_statistics["accommodates"]["min"]
+            )
+
+            tokens[i].bedrooms = min_max(
+                value=tokens[i].bedrooms,
+                value_max=token_statistics["bedrooms"]["max"],
+                value_min=token_statistics["bedrooms"]["min"]
+            )
+
+            tokens[i].accommodates = min_max(
+                value=tokens[i].accommodates,
+                value_max=token_statistics["accommodates"]["max"],
+                value_min=token_statistics["accommodates"]["min"]
+            )
+
+            tokens[i].reviews = min_max(
+                value=tokens[i].reviews,
+                value_max=token_statistics["reviews"]["max"],
+                value_min=token_statistics["reviews"]["min"]
+            )
+
+            tokens[i].review_rating = min_max(
+                value=tokens[i].review_rating,
+                value_max=token_statistics["review_rating"]["max"],
+                value_min=token_statistics["review_rating"]["min"]
+            )
+
+            tokens[i].review_A = min_max(
+                value=tokens[i].review_A,
+                value_max=token_statistics["review_ABCD"]["max"],
+                value_min=token_statistics["review_ABCD"]["min"]
+            )
+
+            tokens[i].review_B = min_max(
+                value=tokens[i].review_B,
+                value_max=token_statistics["review_ABCD"]["max"],
+                value_min=token_statistics["review_ABCD"]["min"]
+            )
+
+            tokens[i].review_C = min_max(
+                value=tokens[i].review_C,
+                value_max=token_statistics["review_ABCD"]["max"],
+                value_min=token_statistics["review_ABCD"]["min"]
+            )
+
+            tokens[i].review_D = min_max(
+                value=tokens[i].review_D,
+                value_max=token_statistics["review_ABCD"]["max"],
+                value_min=token_statistics["review_ABCD"]["min"]
+            )
+
+            for j in range(0, len(tokens[i].bathrooms)):
+                tokens[i].bathrooms[j] = min_max(
+                    value=tokens[i].bathrooms[j],
+                    value_max=token_statistics["bathrooms"]["max"],
+                    value_min=token_statistics["bathrooms"]["min"]
+                )
+    else:
+        print("Norm mode %s not supported." % mode)
+        exit(-1)
 
     return tokens
 
@@ -268,6 +286,10 @@ def get_tokens_statistic(tokens: list[BookingToken]) -> dict:
         "mean": get_statistic(accommodates, mode="mean"),
         "std": get_statistic(accommodates, mode="std")
     }
+
+    for k in statistics.keys():
+        for kk in statistics[k].keys():
+            statistics[k][kk] = float(statistics[k][kk])
 
     return statistics
 
@@ -399,6 +421,25 @@ def infos_to_tokens_with_tokenizer(infos: list[BookingInfo], tokenizer: dict) ->
                     tokens[i].amenities[important_amenities[importance]] = 1.0
 
     return tokens, tokenizer
+
+
+def build_tokens_features(tokens: list[BookingToken]):
+    for i in range(0, len(tokens)):
+        tokens[i].build_features()
+    return tokens
+
+
+# def pre_process_tokens(tokens: list[BookingToken],) -> (list[BookingToken], dict):
+#     """
+#     对tokens进行预处理。
+#     :param tokens:
+#     :return: tokens, statistic
+#     """
+#     statistics = get_tokens_statistic(tokens)
+#     tokens = fix_loss_tokens(tokens=tokens, token_statistics=statistics)
+#     tokens = norm_tokens()
+#
+#     return tokens, statistics
 
 
 if __name__ == '__main__':
