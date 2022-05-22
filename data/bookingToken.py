@@ -1,8 +1,9 @@
 # 将bookingInfo类别编码之后得到的特征
 # 便于后续的处理
 
-from math import isnan, nan
+import numpy as np
 
+from math import isnan
 from data import ImportantAmenity
 from data import BookingInfo
 from data.utils import strs_to_tokens, get_statistic, min_max
@@ -61,13 +62,13 @@ class BookingToken:
         assert self.has_price()
         return self.__price
 
-    def get_aline_feature(self) -> list:
-        return self.neighbor + [self.latitude] + [self.longitude] + self.type + [float(self.accommodates)] +\
-            self.bathrooms + [self.bedrooms] + self.amenities + [float(self.reviews)] + [self.review_rating] +\
-            [self.review_A] + [self.review_B] + [self.review_C] + [self.review_D] + [float(self.instant_bookable)]
+    def get_features(self) -> dict:
+        features = dict()
+        features["position"] = np.array(self.neighbor + [self.latitude] + [self.longitude], dtype=np.float32)
+        return features
 
-    def build_aline_feature(self):
-        self.aline_feature = self.get_aline_feature()
+    # def build_aline_feature(self):
+    #     self.aline_feature = self.get_aline_feature()
 
 
 def norm_tokens(tokens: list[BookingToken], token_statistics: dict):
@@ -216,48 +217,56 @@ def get_tokens_statistic(tokens: list[BookingToken]) -> dict:
     statistics["review_ABCD"] = {
         "min": 0.0,
         "max": 10.0,
-        "mean": get_statistic(review_ABCDs, mode="mean")
+        "mean": get_statistic(review_ABCDs, mode="mean"),
+        "std": get_statistic(review_ABCDs, mode="std")
     }
 
     statistics["review_rating"] = {
         "min": 0.0,
         "max": 100.0,
-        "mean": get_statistic(review_ratings, mode="mean")
+        "mean": get_statistic(review_ratings, mode="mean"),
+        "std": get_statistic(review_ratings, mode="std")
     }
 
     statistics["latitude"] = {
         "min": get_statistic(latitudes, mode="min"),
         "max": get_statistic(latitudes, mode="max"),
-        "mean": get_statistic(latitudes, mode="mean")
+        "mean": get_statistic(latitudes, mode="mean"),
+        "std": get_statistic(latitudes, mode="std")
     }
 
     statistics["longitude"] = {
         "min": get_statistic(longitudes, mode="min"),
         "max": get_statistic(longitudes, mode="max"),
-        "mean": get_statistic(longitudes, mode="mean")
+        "mean": get_statistic(longitudes, mode="mean"),
+        "std": get_statistic(longitudes, mode="std")
     }
 
     statistics["reviews"] = {
         "min": get_statistic(reviews, mode="min"),
         "max": get_statistic(reviews, mode="max"),
-        "mean": get_statistic(reviews, mode="mean")
+        "mean": get_statistic(reviews, mode="mean"),
+        "std": get_statistic(reviews, mode="std")
     }
 
     statistics["bedrooms"] = {
         "min": get_statistic(bedrooms, mode="min"),
         "max": get_statistic(bedrooms, mode="max"),
-        "mean": get_statistic(bedrooms, mode="mean")
+        "mean": get_statistic(bedrooms, mode="mean"),
+        "std": get_statistic(bedrooms, mode="std")
     }
 
     statistics["bathrooms"] = {
         "min": get_statistic(bathrooms, mode="min"),
         "max": get_statistic(bathrooms, mode="max"),
-        "mean": get_statistic(bathrooms, mode="mean")
+        "mean": get_statistic(bathrooms, mode="mean"),
+        "std": get_statistic(bathrooms, mode="std")
     }
     statistics["accommodates"] = {
         "min": get_statistic(accommodates, mode="min"),
         "max": get_statistic(accommodates, mode="max"),
-        "mean": get_statistic(accommodates, mode="mean")
+        "mean": get_statistic(accommodates, mode="mean"),
+        "std": get_statistic(accommodates, mode="std")
     }
 
     return statistics
@@ -409,8 +418,4 @@ if __name__ == '__main__':
     all_tokens = fix_loss_tokens(all_tokens, statistics)
     all_tokens = norm_tokens(all_tokens, statistics)
     for token in all_tokens:
-        token.build_aline_feature()
-        print(token.aline_feature)
-        for a in token.aline_feature:
-            assert a <= 1 + 0.0001
-            assert a >= 0 - 0.0001
+        print(token.get_features())
