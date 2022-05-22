@@ -199,11 +199,19 @@ if __name__ == '__main__':
     # print(bathroom.type, bathroom.num)
     # print(bathroom.to_str())
     from data import InfoFile
-    from data.bookingToken import get_neighbor_tokenizer
-    all_infos = InfoFile("../dataset/split/val.csv").csv_to_booking_info()
-    neighbor_token2str, neighbor_str2token = get_neighbor_tokenizer(all_infos)
+    from data.bookingToken import get_neighbor_tokenizer, get_amenities_tokenizer
+    train_infos = InfoFile("../dataset/train.csv").csv_to_booking_info()
+    train_token2str, train_str2token = get_amenities_tokenizer(train_infos)
+    # test_infos = InfoFile("../dataset/test.csv").csv_to_booking_info()
+    # print(get_neighbor_tokenizer(test_infos))
     test_infos = InfoFile("../dataset/test.csv").csv_to_booking_info()
-    print(get_neighbor_tokenizer(test_infos))
-    print(neighbor_str2token)
+    test_token2str, test_str2token = get_amenities_tokenizer(test_infos)
+    # print(set(train_str2token.keys()))
+    res = 0
+    for k in test_str2token.keys():
+        if k in set(train_str2token.keys()):
+            res += 1
+        # print()
     # print(BathroomType.MISSING.value)
+    print(res)
 
