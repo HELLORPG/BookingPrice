@@ -44,15 +44,15 @@ def run_args_parser() -> argparse.ArgumentParser:
     args_parser.add_argument("--seed", type=int, default=1025)
 
     # 超参数
-    args_parser.add_argument("--batch-size", type=int, default=512)
-    args_parser.add_argument("--epoch", type=int, default=250)
-    args_parser.add_argument("--dropout", type=float, default=0.1)
+    args_parser.add_argument("--batch-size", type=int, default=1024)
+    args_parser.add_argument("--epoch", type=int, default=1000)
+    args_parser.add_argument("--dropout", type=float, default=0.2)
 
     # 优化器
     args_parser.add_argument("--optimizer", type=str, default="Adam")
     args_parser.add_argument("--lr", type=float, default=1e-3)
-    args_parser.add_argument("--weight-decay", type=float, default=1e-6)
-    args_parser.add_argument("--lr-drop", type=int, nargs="+", default=[100, 150, 200])
+    args_parser.add_argument("--weight-decay", type=float, default=0e-6)
+    args_parser.add_argument("--lr-drop", type=int, nargs="+", default=[500, 600, 700, 800, 900])
     args_parser.add_argument("--gamma", type=float, default=0.5)
 
     # 损失函数
