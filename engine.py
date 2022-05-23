@@ -16,6 +16,7 @@ from torch.utils.data import DataLoader
 from model.bookingNet import BookingNet
 import torch.optim as optim
 import torch.nn as nn
+from sklearn.metrics import f1_score, accuracy_score
 
 
 def train(args):
@@ -151,12 +152,15 @@ def evaluate(args, net, dataloader, loss_function, is_val=True):
 
     if is_val:
         average_loss = total_loss / total_len
-        average_acc = np.sum(np.array(get_correct_list(pred_list, label_list))) / total_len
-        print("val", average_loss, average_acc)
+        # average_acc = np.sum(np.array(get_correct_list(pred_list, label_list))) / total_len
+        # print("val", average_loss, average_acc)
+        # print("val", accuracy_score(label_list, pred_list))
         return {
             "loss": average_loss,
-            "acc": average_acc,
-            "pred_labels": pred_list
+            "acc": accuracy_score(label_list, pred_list),
+            "pred_labels": pred_list,
+            "true_labels": label_list,
+            "f1_score": f1_score(label_list, pred_list, average="macro")
         }
     else:
         return {
@@ -204,13 +208,15 @@ def train_one_epoch(epoch: int, args, net, optimizer, dataloader, loss_function)
         total_len += batch_len
 
     average_loss = total_loss / total_len
-    average_acc = np.sum(np.array(get_correct_list(pred_list, label_list))) / total_len
-    print("train", average_loss, average_acc)
+    # average_acc = np.sum(np.array(get_correct_list(pred_list, label_list))) / total_len
+    # print("train", average_loss, average_acc)
 
     return {
         "loss": average_loss,
-        "acc": average_acc,
+        "acc": accuracy_score(label_list, pred_list),
         "pred_labels": pred_list,
+        "true_labels": label_list,
+        "f1_score": f1_score(label_list, pred_list, average="macro")
     }
 
 
