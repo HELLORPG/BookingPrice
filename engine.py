@@ -170,6 +170,27 @@ def train(args):
 
     with open(os.path.join(args.log_dir, "log.json"), "a") as f:
         f.write("==================================================================\n")
+
+    if args.with_test == "True":
+        test_infos = InfoFile(path=args.test_path).csv_to_booking_info()
+        test_tokens, _ = infos_to_tokens_with_tokenizer(infos=test_infos, tokenizer=tokenizer)
+        test_tokens = fix_loss_tokens(tokens=test_tokens, token_statistics=data_statistic)
+        test_tokens = norm_tokens(tokens=test_tokens, token_statistics=data_statistic)
+        test_tokens = build_tokens_features(tokens=test_tokens)
+        test_dataset = BookingDataset(test_tokens)
+        test_loader = DataLoader(test_dataset)
+        test_log = evaluate(
+            net=net,
+            dataloader=test_loader,
+            loss_function=loss_function,
+            args=args,
+            is_val=False
+        )
+        with open(args.output_path, "w") as f:
+            for pred_label in test_log["pred_labels"]:
+                f.write(str(int(pred_label)))
+                f.write("\n")
+
     return
 
 

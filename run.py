@@ -19,7 +19,7 @@ def run_args_parser() -> argparse.ArgumentParser:
     args_parser.add_argument("--input-path", type=str)
 
     # 输出路径
-    args_parser.add_argument("--output-path", type=str)
+    args_parser.add_argument("--output-path", type=str, default="./outputs/test.txt")
 
     # 对于split_train_val独有的参数
     args_parser.add_argument("--train-path", type=str, default="./dataset/split/train.csv")     # 和train过程中的train path共用
@@ -38,7 +38,9 @@ def run_args_parser() -> argparse.ArgumentParser:
 
     # 是否增加验证输出
     args_parser.add_argument("--with-val", type=str, default="True", help="Train with eval val.")
-    # args_parser.add_argument("--with-test", type=str, default="True", help="Test at final.")
+    # 是否在最后增加Test输出
+    args_parser.add_argument("--with-test", type=str, default="True")
+    args_parser.add_argument("--test-path", type=str, default="./dataset/test.csv")
 
     # 随机种子
     args_parser.add_argument("--seed", type=int, default=1025)
