@@ -51,7 +51,7 @@ def run_args_parser() -> argparse.ArgumentParser:
     # 优化器
     args_parser.add_argument("--optimizer", type=str, default="Adam")
     args_parser.add_argument("--lr", type=float, default=1e-3)
-    args_parser.add_argument("--weight-decay", type=float, default=1e-3)
+    args_parser.add_argument("--weight-decay", type=float, default=1e-5)
     args_parser.add_argument("--lr-drop", type=int, nargs="+", default=[200, 250])
     args_parser.add_argument("--gamma", type=float, default=0.5)
 
