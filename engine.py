@@ -4,6 +4,7 @@ train and val functions.
 
 import json
 import os
+import random
 
 import numpy as np
 import torch
@@ -25,6 +26,12 @@ def train(args):
     :param args:
     :return:
     """
+    # 设置随机种子
+    torch.manual_seed(args.seed)
+    torch.cuda.manual_seed_all(args.seed)
+    np.random.seed(args.seed)
+    random.seed(args.seed)
+
     train_infos = InfoFile(args.train_path).csv_to_booking_info()
     if args.with_val == "True":
         val_infos = InfoFile(args.val_path).csv_to_booking_info()
@@ -88,11 +95,23 @@ def train(args):
         )
 
     # 模型和优化器等
+    class_weight = [0.0] * 6    # 交叉熵使用的权重列表
+    for token in train_tokens:
+        class_weight[token.get_price()] += 1.0
+    for i in range(0, len(class_weight)):
+        class_weight[i] = 1 / class_weight[i]
+    class_weight = torch.from_numpy(np.array(class_weight, dtype=np.float32)).to(args.device)
     net = BookingNet(args=args, features_len=features_len).to(args.device)
+    # 对模型进行初始化
+    for m in net.modules():
+        if isinstance(m, nn.Linear):
+            nn.init.kaiming_normal_(m.weight)
+
     if args.optimizer == "Adam":
         optimizer = optim.Adam(params=net.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     else:
         print("Optimizer type %s is not supported." % args.optimizer)
+        optimizer = None
         exit(-1)
 
     if args.loss_function == "L1":
@@ -100,9 +119,14 @@ def train(args):
     elif args.loss_function == "SmoothL1":
         loss_function = nn.SmoothL1Loss(reduction="mean")
     elif args.loss_function == "CEL":
-        loss_function = nn.CrossEntropyLoss(reduction="mean")
+        loss_function = nn.CrossEntropyLoss(reduction="mean", weight=class_weight)
     else:
         print("Loss function type %s is not supported." % args.loss_function)
+        loss_function = None
+        exit(-1)
+
+    # 创建输出目录
+    os.makedirs(args.log_dir, exist_ok=True)
 
     # 训练
     for epoch in range(0, args.epoch):
@@ -130,7 +154,15 @@ def train(args):
             del epoch_log["val"]["pred_labels"]
             del epoch_log["val"]["true_labels"]
 
+        with open(os.path.join(args.log_dir, "log.json"), "a") as f:
+            f.write(json.dumps(epoch_log))
+            f.write("\n")
+            # json.dump(epoch_log, f)
         print(epoch_log)
+
+    with open(os.path.join(args.log_dir, "log.json"), "a") as f:
+        f.write("==================================================================\n")
+    return
 
 
 @torch.no_grad()

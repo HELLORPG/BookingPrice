@@ -34,13 +34,17 @@ def run_args_parser() -> argparse.ArgumentParser:
 
     # 输出文件
     args_parser.add_argument("--data-meta-dir", type=str, default="./outputs/meta")
+    args_parser.add_argument("--log-dir", type=str, default="./outputs/log")
 
     # 是否增加验证输出
     args_parser.add_argument("--with-val", type=str, default="True", help="Train with eval val.")
     # args_parser.add_argument("--with-test", type=str, default="True", help="Test at final.")
 
+    # 随机种子
+    args_parser.add_argument("--seed", type=int, default=1025)
+
     # 超参数
-    args_parser.add_argument("--batch-size", type=int, default=256)
+    args_parser.add_argument("--batch-size", type=int, default=128)
     args_parser.add_argument("--epoch", type=int, default=400)
 
     # 优化器
@@ -50,9 +54,6 @@ def run_args_parser() -> argparse.ArgumentParser:
 
     # 损失函数
     args_parser.add_argument("--loss-function", type=str, default="CEL")
-
-    # 输出位置
-
 
     # 模型结构
     args_parser.add_argument("--activation", type=str, default="relu")
