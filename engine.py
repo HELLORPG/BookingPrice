@@ -106,22 +106,31 @@ def train(args):
 
     # 训练
     for epoch in range(0, args.epoch):
-        train_one_epoch(
-            epoch=epoch,
-            args=args,
-            net=net,
-            optimizer=optimizer,
-            dataloader=train_loader,
-            loss_function=loss_function
-        )
+        epoch_log = dict()
+        epoch_log["epoch"] = epoch
+
+        epoch_log["train"] = train_one_epoch(
+                                epoch=epoch,
+                                args=args,
+                                net=net,
+                                optimizer=optimizer,
+                                dataloader=train_loader,
+                                loss_function=loss_function
+                            )
+        del epoch_log["train"]["pred_labels"]
+        del epoch_log["train"]["true_labels"]
 
         if args.with_val == "True":
-            evaluate(
-                net=net,
-                dataloader=val_loader,
-                loss_function=loss_function,
-                args=args
-            )
+            epoch_log["val"] = evaluate(
+                                    net=net,
+                                    dataloader=val_loader,
+                                    loss_function=loss_function,
+                                    args=args
+                                )
+            del epoch_log["val"]["pred_labels"]
+            del epoch_log["val"]["true_labels"]
+
+        print(epoch_log)
 
 
 @torch.no_grad()

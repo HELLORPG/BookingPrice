@@ -51,6 +51,9 @@ def run_args_parser() -> argparse.ArgumentParser:
     # 损失函数
     args_parser.add_argument("--loss-function", type=str, default="CEL")
 
+    # 输出位置
+
+
     # 模型结构
     args_parser.add_argument("--activation", type=str, default="relu")
     args_parser.add_argument("--pred-mode", type=str, default="classify")
