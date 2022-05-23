@@ -46,7 +46,7 @@ def run_args_parser() -> argparse.ArgumentParser:
     args_parser.add_argument("--seed", type=int, default=1025)
 
     # 超参数
-    args_parser.add_argument("--batch-size", type=int, default=1024)
+    args_parser.add_argument("--batch-size", type=int, default=2048)
     args_parser.add_argument("--epoch", type=int, default=1000)
     args_parser.add_argument("--dropout", type=float, default=0.2)
 

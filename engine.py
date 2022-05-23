@@ -8,6 +8,7 @@ import random
 
 import numpy as np
 import torch
+import matplotlib.pyplot as plt
 
 from data import InfoFile, BookingToken
 from data.dataset import BookingDataset
@@ -132,8 +133,16 @@ def train(args):
         loss_function = None
         exit(-1)
 
-    # 创建输出目录
+    # 创建log目录
     os.makedirs(args.log_dir, exist_ok=True)
+
+    # 记录数据用于绘图
+    train_loss = list()
+    train_acc = list()
+    train_f1 = list()
+    val_loss = list()
+    val_acc = list()
+    val_f1 = list()
 
     # 训练
     for epoch in range(0, args.epoch):
@@ -151,6 +160,10 @@ def train(args):
         del epoch_log["train"]["pred_labels"]
         del epoch_log["train"]["true_labels"]
 
+        train_loss.append(epoch_log["train"]["loss"])
+        train_acc.append(epoch_log["train"]["acc"])
+        train_f1.append(epoch_log["train"]["f1_score"])
+
         if args.with_val == "True":
             epoch_log["val"] = evaluate(
                                     net=net,
@@ -161,6 +174,10 @@ def train(args):
             del epoch_log["val"]["pred_labels"]
             del epoch_log["val"]["true_labels"]
 
+            val_loss.append(epoch_log["val"]["loss"])
+            val_acc.append(epoch_log["val"]["acc"])
+            val_f1.append(epoch_log["val"]["f1_score"])
+
         with open(os.path.join(args.log_dir, "log.json"), "a") as f:
             f.write(json.dumps(epoch_log))
             f.write("\n")
@@ -170,6 +187,37 @@ def train(args):
 
     with open(os.path.join(args.log_dir, "log.json"), "a") as f:
         f.write("==================================================================\n")
+
+    # 进行绘图
+    if args.with_val == "True":
+        plt.figure(dpi=600)
+        line_width = 1
+        plt.title("Train and Val Loss")
+        plt.plot(train_loss, color="blue", label="train", linewidth=line_width)
+        plt.plot(val_loss, color="red", label="val", linewidth=line_width)
+        plt.xlabel("epochs")
+        plt.ylabel("loss")
+        plt.legend()
+        plt.savefig(os.path.join(args.log_dir, "loss.png"))
+        plt.clf()
+
+        plt.title("Train and Val Acc")
+        plt.plot(train_acc, color="blue", label="train", linewidth=line_width)
+        plt.plot(val_acc, color="red", label="val", linewidth=line_width)
+        plt.xlabel("epochs")
+        plt.ylabel("acc")
+        plt.legend()
+        plt.savefig(os.path.join(args.log_dir, "acc.png"))
+        plt.clf()
+
+        plt.title("Train and Val F1-Score")
+        plt.plot(train_f1, color="blue", label="train", linewidth=line_width)
+        plt.plot(val_f1, color="red", label="val", linewidth=line_width)
+        plt.xlabel("epochs")
+        plt.ylabel("F1-Score")
+        plt.legend()
+        plt.savefig(os.path.join(args.log_dir, "f1_score.png"))
+        plt.clf()
 
     if args.with_test == "True":
         test_infos = InfoFile(path=args.test_path).csv_to_booking_info()
