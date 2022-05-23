@@ -44,19 +44,22 @@ def run_args_parser() -> argparse.ArgumentParser:
     args_parser.add_argument("--seed", type=int, default=1025)
 
     # 超参数
-    args_parser.add_argument("--batch-size", type=int, default=128)
-    args_parser.add_argument("--epoch", type=int, default=400)
+    args_parser.add_argument("--batch-size", type=int, default=256)
+    args_parser.add_argument("--epoch", type=int, default=300)
+    args_parser.add_argument("--dropout", type=float, default=0.0)
 
     # 优化器
     args_parser.add_argument("--optimizer", type=str, default="Adam")
-    args_parser.add_argument("--lr", type=float, default=1e-4)
-    args_parser.add_argument("--weight-decay", type=float, default=1e-5)
+    args_parser.add_argument("--lr", type=float, default=1e-3)
+    args_parser.add_argument("--weight-decay", type=float, default=1e-3)
+    args_parser.add_argument("--lr-drop", type=int, nargs="+", default=[200, 250])
+    args_parser.add_argument("--gamma", type=float, default=0.5)
 
     # 损失函数
     args_parser.add_argument("--loss-function", type=str, default="CEL")
 
     # 模型结构
-    args_parser.add_argument("--activation", type=str, default="relu")
+    args_parser.add_argument("--activation", type=str, default="LReLU")
     args_parser.add_argument("--pred-mode", type=str, default="classify")
     args_parser.add_argument("--position-mlp-layers", default=[60, 80, 40, 20], type=int, nargs="+")
     args_parser.add_argument("--room-mlp-layers", default=[20, 40, 40, 20], type=int, nargs="+")

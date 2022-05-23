@@ -18,28 +18,32 @@ class BookingNet(nn.Module):
             input_channels=features_len["position"],
             output_channels=args.position_mlp_layers,
             activation=args.activation,
-            activation_at_final=True
+            activation_at_final=True,
+            dropout=args.dropout
         )
 
         self.room_net = MLP(
             input_channels=features_len["room"],
             output_channels=args.room_mlp_layers,
             activation=args.activation,
-            activation_at_final=True
+            activation_at_final=True,
+            dropout=args.dropout
         )
 
         self.addition_net = MLP(
             input_channels=features_len["addition"],
             output_channels=args.addition_mlp_layers,
             activation=args.activation,
-            activation_at_final=True
+            activation_at_final=True,
+            dropout=args.dropout
         )
 
         self.review_net = MLP(
             input_channels=features_len["review"],
             output_channels=args.review_mlp_layers,
             activation=args.activation,
-            activation_at_final=True
+            activation_at_final=True,
+            dropout=args.dropout
         )
 
         self.final_net = MLP(
@@ -47,7 +51,8 @@ class BookingNet(nn.Module):
             args.addition_mlp_layers[-1] + features_len["instant"],
             output_channels=args.final_mlp_layers,
             activation=args.activation,
-            activation_at_final=False
+            activation_at_final=False,
+            dropout=args.dropout
         )
 
     def forward(self, x):

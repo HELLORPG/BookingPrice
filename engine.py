@@ -18,6 +18,7 @@ from model.bookingNet import BookingNet
 import torch.optim as optim
 import torch.nn as nn
 from sklearn.metrics import f1_score, accuracy_score
+from torch.optim import lr_scheduler
 
 
 def train(args):
@@ -114,6 +115,12 @@ def train(args):
         optimizer = None
         exit(-1)
 
+    scheduler = lr_scheduler.MultiStepLR(
+        optimizer=optimizer,
+        milestones=args.lr_drop,
+        gamma=args.gamma
+    )
+
     if args.loss_function == "L1":
         loss_function = nn.L1Loss(reduction="mean")
     elif args.loss_function == "SmoothL1":
@@ -159,6 +166,7 @@ def train(args):
             f.write("\n")
             # json.dump(epoch_log, f)
         print(epoch_log)
+        scheduler.step()
 
     with open(os.path.join(args.log_dir, "log.json"), "a") as f:
         f.write("==================================================================\n")
