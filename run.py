@@ -46,7 +46,7 @@ def run_args_parser() -> argparse.ArgumentParser:
     # 超参数
     args_parser.add_argument("--batch-size", type=int, default=256)
     args_parser.add_argument("--epoch", type=int, default=300)
-    args_parser.add_argument("--dropout", type=float, default=0.0)
+    args_parser.add_argument("--dropout", type=float, default=0.2)
 
     # 优化器
     args_parser.add_argument("--optimizer", type=str, default="Adam")
